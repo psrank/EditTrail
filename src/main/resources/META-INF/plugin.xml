@@ -1,0 +1,41 @@
+<idea-plugin>
+    <id>com.psrank.edittrail</id>
+    <name>EditTrail</name>
+    <vendor>psrank</vendor>
+
+    <description><![CDATA[
+        Track recently viewed and edited files per project in a dedicated tool window.
+        Quickly return to your working context without navigating the project tree.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <!-- Tool window — rendered by EditTrailToolWindowFactory -->
+        <toolWindow
+            id="EditTrail"
+            anchor="right"
+            secondary="true"
+            factoryClass="com.psrank.edittrail.EditTrailToolWindowFactory"/>
+
+        <!-- Project-level persistent service — owns history state and repository -->
+        <projectService
+            serviceImplementation="com.psrank.edittrail.EditTrailProjectService"/>
+
+    </extensions>
+
+    <projectListeners>
+        <!-- Tracks file open/tab-switch events and attaches document change listeners -->
+        <listener
+            class="com.psrank.edittrail.EditorSelectionListener"
+            topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Runs on project open to validate persisted file URLs against the file system -->
+        <postStartupActivity implementation="com.psrank.edittrail.EditTrailStartupActivity"/>
+    </extensions>
+
+</idea-plugin>
