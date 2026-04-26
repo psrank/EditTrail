@@ -1,0 +1,25 @@
+# Gradle build output
+build/
+.gradle/
+
+# IntelliJ Platform Gradle Plugin cache (downloaded IDE, sandbox)
+.intellijPlatform/
+
+# Kotlin / JVM compiled output
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE project files — keep .code-workspace, ignore per-user IDE state
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
