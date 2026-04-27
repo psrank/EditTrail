@@ -1,7 +1,7 @@
 # OpenSpec Autorun Progress
 
-Last updated: 2026-04-27T02:00:00Z
-Session stages completed: 6
+Last updated: 2026-04-27T02:30:00Z
+Session stages completed: 9
 
 ## Status Table
 
@@ -10,7 +10,7 @@ Session stages completed: 6
 | 001       | core-history                 | archive       | completed   | 2026-04-26 | 2026-04-26 |
 | 002       | intuitive-search             | archive       | completed   | 2026-04-26 | 2026-04-26 |
 | 003       | file-type-filters            | archive       | completed   | 2026-04-26 | 2026-04-26 |
-| 004       | global-project-search        | verify        | in-progress | 2026-04-27 |           |
+| 004       | global-project-search        | archive       | completed   | 2026-04-27 | 2026-04-27 |
 | 005       | visual-grouping              | —             | pending |         |           |
 | 006       | settings-and-polish          | —             | pending |         |           |
 
@@ -56,9 +56,9 @@ Session stages completed: 6
 - [x] tests-before
 - [x] apply
 - [x] tests-after
-- [ ] verify
-- [ ] verify-runtime
-- [ ] archive
+- [x] verify
+- [x] verify-runtime
+- [x] archive
 
 ### 005 — visual-grouping
 - [ ] branch
