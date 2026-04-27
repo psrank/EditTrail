@@ -169,6 +169,14 @@ class EditTrailPanel(
                 allEntries.filter { SearchFilter.matches(it, options) }
             }
 
+            // Dispatch group assignment off-EDT; repaint when done.
+            ApplicationManager.getApplication().executeOnPooledThread {
+                FileGrouper.assignGroups(allEntries)
+                ApplicationManager.getApplication().invokeLater {
+                    list.repaint()
+                }
+            }
+
             // When global search is enabled and query is non-blank, fetch project files.
             if (globalSearchBox.isSelected && options.query.isNotBlank()) {
                 val historyUrls = allEntries.map { it.fileUrl }.toSet()
@@ -394,9 +402,22 @@ class EditTrailPanel(
             sortMode = if (combo.selectedIndex == 0) SortMode.LAST_EDITED else SortMode.LAST_VIEWED
             refresh()
         }
+
+        val recalcButton = JButton("Recalculate groups")
+        recalcButton.addActionListener {
+            val entries = project.service<EditTrailProjectService>().getHistory(sortMode)
+            ApplicationManager.getApplication().executeOnPooledThread {
+                FileGrouper.assignGroups(entries)
+                ApplicationManager.getApplication().invokeLater {
+                    list.repaint()
+                }
+            }
+        }
+
         val bar = JPanel(FlowLayout(FlowLayout.LEFT, 4, 2))
         bar.add(JBLabel("Sort:"))
         bar.add(combo)
+        bar.add(recalcButton)
         return bar
     }
 
