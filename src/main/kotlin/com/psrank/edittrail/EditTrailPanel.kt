@@ -50,6 +50,10 @@ class EditTrailPanel(
     private val regexBox = JCheckBox("Regex")
     private val caseSensitiveBox = JCheckBox("Case sensitive")
 
+    // ── File-type filter state ────────────────────────────────────────────────────
+    private val selectedFileTypes: MutableSet<String> = mutableSetOf()
+    private val chipBarPanel = JPanel(FlowLayout(FlowLayout.LEFT, 4, 2))
+
     /** Incremented on every search change to discard stale content-search results. */
     private val searchGeneration = AtomicInteger(0)
 
@@ -84,10 +88,11 @@ class EditTrailPanel(
             cb.addActionListener { onSearchChange() }
         }
 
-        val northPanel = JPanel(GridLayout(3, 1))
+        val northPanel = JPanel(GridLayout(4, 1))
         northPanel.add(createSortBar())
         northPanel.add(createSearchBar())
         northPanel.add(createToggleBar())
+        northPanel.add(createChipBarScrollPane())
 
         add(northPanel, BorderLayout.NORTH)
         add(JBScrollPane(list), BorderLayout.CENTER)
@@ -196,14 +201,66 @@ class EditTrailPanel(
         }
     }
 
-    private fun applyToModel(entries: List<FileHistoryEntry>) {
+    /** Called with the search-filtered list. Computes chips, rebuilds chip bar, then applies file-type filter. */
+    private fun applyToModel(searchFiltered: List<FileHistoryEntry>) {
+        // 4.1 Compute per-type counts from search-filtered list
+        val counts: Map<String, Int> = searchFiltered
+            .groupingBy { FileTypeClassifier.classify(it.fileName) }
+            .eachCount()
+
+        // 4.2 Build chip list; mark selected if the label is in selectedFileTypes
+        val chips: List<FileTypeChip> = counts.entries
+            .sortedByDescending { it.value }
+            .map { (label, count) -> FileTypeChip(label, count, label in selectedFileTypes) }
+
+        // 4.3 Rebuild chip bar
+        rebuildChipBar(chips)
+
+        // 4.4 Apply file-type filter
+        val visible = if (selectedFileTypes.isEmpty()) {
+            searchFiltered
+        } else {
+            searchFiltered.filter { FileTypeClassifier.classify(it.fileName) in selectedFileTypes }
+        }
+
         model.clear()
-        if (entries.isEmpty()) {
+        if (visible.isEmpty()) {
             list.emptyText.text = "No recent files. Open and edit files to see them here."
         } else {
             list.emptyText.text = ""
-            entries.forEach { model.addElement(it) }
+            visible.forEach { model.addElement(it) }
         }
+    }
+
+    /** Rebuilds the chip bar from the supplied chip list. Must be called on the EDT. */
+    private fun rebuildChipBar(chips: List<FileTypeChip>) {
+        chipBarPanel.removeAll()
+
+        // 3.4 / 3.5  "All" button — appears bold when no type is selected
+        val allButton = JButton("All")
+        if (selectedFileTypes.isEmpty()) {
+            allButton.font = allButton.font.deriveFont(java.awt.Font.BOLD)
+        }
+        // 3.7 Wire All button to clear selection then refresh
+        allButton.addActionListener {
+            selectedFileTypes.clear()
+            refresh()
+        }
+        chipBarPanel.add(allButton)
+
+        // 3.4 / 3.6  Per-type toggle buttons
+        chips.forEach { chip ->
+            val toggle = JToggleButton("${chip.label} (${chip.count})", chip.selected)
+            toggle.addActionListener {
+                if (toggle.isSelected) selectedFileTypes.add(chip.label)
+                else selectedFileTypes.remove(chip.label)
+                refresh()
+            }
+            chipBarPanel.add(toggle)
+        }
+
+        chipBarPanel.revalidate()
+        chipBarPanel.repaint()
     }
 
     // ── Actions ──────────────────────────────────────────────────────────────────
@@ -249,5 +306,13 @@ class EditTrailPanel(
         bar.add(regexBox)
         bar.add(caseSensitiveBox)
         return bar
+    }
+
+    private fun createChipBarScrollPane(): JScrollPane {
+        val scroll = JScrollPane(chipBarPanel)
+        scroll.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        scroll.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_NEVER
+        scroll.border = null
+        return scroll
     }
 }
