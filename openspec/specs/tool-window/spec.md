@@ -27,6 +27,11 @@ The plugin SHALL provide a project-level tool window named `EditTrail` that rend
 - **WHEN** the user activates the EditTrail tool window
 - **THEN** the history panel SHALL display a "Recalculate groups" button or action
 
+#### Scenario: History panel includes a clear history action
+- **WHEN** the user activates the EditTrail tool window
+- **THEN** the history panel SHALL display a "Clear history" button
+- **AND** clicking it SHALL prompt the user for confirmation before clearing
+
 #### Scenario: Empty state is shown when no history exists
 - **WHEN** the EditTrail tool window is opened and the project has no recorded history
 - **THEN** the panel SHALL display an empty-state message explaining that recently viewed and edited files will appear there

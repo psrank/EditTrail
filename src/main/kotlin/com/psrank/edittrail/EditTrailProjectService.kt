@@ -23,7 +23,9 @@ import com.intellij.vcsUtil.VcsUtil
 class EditTrailProjectService(private val project: Project) :
     PersistentStateComponent<FileHistoryState> {
 
-    private val repository = FileHistoryRepository()
+    private val repository = FileHistoryRepository(
+        maxSize = EditTrailAppSettings.getInstance().state.maxHistorySize
+    )
     private var myState = FileHistoryState()
 
     // ── PersistentStateComponent ────────────────────────────────────────────────
@@ -74,6 +76,17 @@ class EditTrailProjectService(private val project: Project) :
     /** Persists the global-search-enabled flag. */
     fun setGlobalSearchEnabled(enabled: Boolean) {
         myState.globalSearchEnabled = enabled
+    }
+
+    /** Updates the repository's maximum history size (called when settings change). */
+    fun setMaxSize(newMax: Int) {
+        repository.setMaxSize(newMax)
+    }
+
+    /** Clears all history entries and notifies listeners. */
+    fun clearHistory() {
+        repository.clearAll()
+        notifyHistoryChanged()
     }
 
     /**

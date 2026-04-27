@@ -25,9 +25,21 @@ The plugin SHALL persist history entries per project across IDE restarts using I
 - **THEN** each project SHALL have its own independent EditTrail history
 
 ### Requirement: Enforce a maximum history size
-The plugin SHALL limit stored history entries to a configurable maximum (default 500).
+The plugin SHALL limit stored history entries to a configurable maximum (default 500). The limit is controlled by `EditTrailAppSettings.maxHistorySize` and applied at runtime without an IDE restart.
 
 #### Scenario: History exceeds the limit
 - **WHEN** a new file is added to history and the total count exceeds the configured maximum
 - **THEN** the oldest least-recently-used entry SHALL be evicted
 - **AND** the total count SHALL remain at or below the maximum
+
+#### Scenario: User changes the limit in settings
+- **WHEN** the user reduces `Max history entries` in IDE Settings
+- **THEN** EditTrail SHALL trim oldest entries immediately so the total is at or below the new limit
+
+### Requirement: Clear history
+The plugin SHALL allow the user to remove all history entries for the current project via a dedicated action.
+
+#### Scenario: History is cleared
+- **WHEN** `clearHistory()` is invoked on `EditTrailProjectService`
+- **THEN** all stored history entries SHALL be removed
+- **AND** the `HISTORY_UPDATED` event SHALL be published so the UI refreshes

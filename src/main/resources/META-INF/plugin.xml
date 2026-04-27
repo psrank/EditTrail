@@ -20,9 +20,20 @@
             secondary="true"
             factoryClass="com.psrank.edittrail.EditTrailToolWindowFactory"/>
 
+        <!-- Application-level settings service — stores user preferences -->
+        <applicationService
+            serviceImplementation="com.psrank.edittrail.EditTrailAppSettings"/>
+
         <!-- Project-level persistent service — owns history state and repository -->
         <projectService
             serviceImplementation="com.psrank.edittrail.EditTrailProjectService"/>
+
+        <!-- Settings page under IDE Settings → Tools → EditTrail -->
+        <applicationConfigurable
+            parentId="tools"
+            id="com.psrank.edittrail.EditTrailConfigurable"
+            displayName="EditTrail"
+            instance="com.psrank.edittrail.EditTrailConfigurable"/>
 
     </extensions>
 
