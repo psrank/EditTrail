@@ -1,9 +1,11 @@
 package com.psrank.edittrail
 
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
@@ -29,8 +31,9 @@ import javax.swing.event.DocumentListener
  * Layout (top to bottom):
  * 1. Sort combo (Last Edited / Last Viewed)
  * 2. Search field ("Search files…")
- * 3. Toggle row (Match path | Match content | Regex | Case sensitive)
- * 4. Scrollable [JBList] of [FileHistoryEntry] items
+ * 3. Toggle row (Match path | Match content | Regex | Case sensitive | Include all project files)
+ * 4. File-type chip bar
+ * 5. Scrollable [JBList] of [EditTrailResult] items
  *
  * Subscribes to [EditTrailTopics.HISTORY_UPDATED] so the list refreshes automatically.
  */
@@ -39,7 +42,7 @@ class EditTrailPanel(
     toolWindow: ToolWindow
 ) : JPanel(BorderLayout()) {
 
-    private val model = DefaultListModel<FileHistoryEntry>()
+    private val model = DefaultListModel<EditTrailResult>()
     private val list = JBList(model)
     private var sortMode: SortMode = SortMode.LAST_EDITED
 
@@ -49,6 +52,7 @@ class EditTrailPanel(
     private val matchContentBox = JCheckBox("Match content")
     private val regexBox = JCheckBox("Regex")
     private val caseSensitiveBox = JCheckBox("Case sensitive")
+    private val globalSearchBox = JCheckBox("Include all project files")
 
     // ── File-type filter state ────────────────────────────────────────────────────
     private val selectedFileTypes: MutableSet<String> = mutableSetOf()
@@ -56,6 +60,9 @@ class EditTrailPanel(
 
     /** Incremented on every search change to discard stale content-search results. */
     private val searchGeneration = AtomicInteger(0)
+
+    /** Incremented on every global scan dispatch to discard stale project-file results. */
+    private val globalScanGeneration = AtomicInteger(0)
 
     /** Debounce timer — restarted on every search-field change. */
     private val debounceTimer = Timer(300) { refresh() }.apply { isRepeats = false }
@@ -86,6 +93,14 @@ class EditTrailPanel(
         // Toggle checkboxes all trigger a refresh
         listOf(matchPathBox, matchContentBox, regexBox, caseSensitiveBox).forEach { cb ->
             cb.addActionListener { onSearchChange() }
+        }
+
+        // Load persisted global-search toggle state and wire change listener
+        val svc = project.service<EditTrailProjectService>()
+        globalSearchBox.isSelected = svc.isGlobalSearchEnabled()
+        globalSearchBox.addActionListener {
+            svc.setGlobalSearchEnabled(globalSearchBox.isSelected)
+            onSearchChange()
         }
 
         val northPanel = JPanel(GridLayout(4, 1))
@@ -145,7 +160,7 @@ class EditTrailPanel(
                 .getHistory(sortMode)
                 .filter { it.exists }
 
-            val visible = if (options.query.isBlank()) {
+            val historyFiltered = if (options.query.isBlank()) {
                 allEntries
             } else if (options.regex && !SearchFilter.isValidRegex(options.query)) {
                 // Invalid regex — retain current list unchanged
@@ -154,7 +169,25 @@ class EditTrailPanel(
                 allEntries.filter { SearchFilter.matches(it, options) }
             }
 
-            applyToModel(visible)
+            // When global search is enabled and query is non-blank, fetch project files.
+            if (globalSearchBox.isSelected && options.query.isNotBlank()) {
+                val historyUrls = allEntries.map { it.fileUrl }.toSet()
+                val generation = globalScanGeneration.incrementAndGet()
+
+                ApplicationManager.getApplication().executeOnPooledThread {
+                    val projectResults = fetchProjectFiles(options.query, historyUrls)
+                    if (generation != globalScanGeneration.get()) return@executeOnPooledThread
+
+                    ApplicationManager.getApplication().invokeLater {
+                        if (generation == globalScanGeneration.get()) {
+                            applyToModel(historyFiltered, projectResults)
+                        }
+                    }
+                }
+            } else {
+                // No global search — show only history.
+                applyToModel(historyFiltered)
+            }
         }
     }
 
@@ -201,26 +234,88 @@ class EditTrailPanel(
         }
     }
 
-    /** Called with the search-filtered list. Computes chips, rebuilds chip bar, then applies file-type filter. */
-    private fun applyToModel(searchFiltered: List<FileHistoryEntry>) {
-        // 4.1 Compute per-type counts from search-filtered list
-        val counts: Map<String, Int> = searchFiltered
-            .groupingBy { FileTypeClassifier.classify(it.fileName) }
-            .eachCount()
+    // ── Project file scan ─────────────────────────────────────────────────────────
 
-        // 4.2 Build chip list; mark selected if the label is in selectedFileTypes
+    /**
+     * Fetches project files whose names contain [query] (case-insensitive),
+     * excluding files already in [historyUrls]. Capped at 50 results.
+     * Must be called on a pooled thread; runs inside a [ReadAction].
+     */
+    private fun fetchProjectFiles(
+        query: String,
+        historyUrls: Set<String>
+    ): List<EditTrailResult.ProjectFileResult> {
+        return ReadAction.compute<List<EditTrailResult.ProjectFileResult>, Throwable> {
+            val results = mutableListOf<EditTrailResult.ProjectFileResult>()
+            val queryLower = query.lowercase()
+            val basePath = project.basePath ?: ""
+
+            ProjectRootManager.getInstance(project).fileIndex.iterateContent { vf ->
+                if (results.size >= 50) return@iterateContent false
+                if (vf.isDirectory) return@iterateContent true
+                if (vf.url in historyUrls) return@iterateContent true
+                if (vf.name.lowercase().contains(queryLower)) {
+                    val rel = if (basePath.isNotEmpty() && vf.path.startsWith(basePath)) {
+                        vf.path.substring(basePath.length).trimStart('/', '\\')
+                    } else {
+                        vf.path
+                    }
+                    results.add(
+                        EditTrailResult.ProjectFileResult(
+                            virtualFile = vf,
+                            fileName = vf.name,
+                            relativePath = rel,
+                            fileType = FileTypeClassifier.classify(vf.name)
+                        )
+                    )
+                }
+                true
+            }
+            results
+        }
+    }
+
+    // ── Model update ─────────────────────────────────────────────────────────────
+
+    /**
+     * Merges history and project-file results, rebuilds the chip bar, applies the
+     * file-type chip filter, and populates the list model.
+     */
+    private fun applyToModel(
+        historyResults: List<FileHistoryEntry>,
+        projectResults: List<EditTrailResult.ProjectFileResult> = emptyList()
+    ) {
+        // 6.1 History first, then project file results.
+        val mergedResults: List<EditTrailResult> =
+            historyResults.map { EditTrailResult.HistoryResult(it) } + projectResults
+
+        // 6.3 Compute per-type counts across full merged set.
+        val counts: Map<String, Int> = mergedResults.groupingBy { result ->
+            when (result) {
+                is EditTrailResult.HistoryResult ->
+                    FileTypeClassifier.classify(result.entry.fileName)
+                is EditTrailResult.ProjectFileResult -> result.fileType
+            }
+        }.eachCount()
+
         val chips: List<FileTypeChip> = counts.entries
             .sortedByDescending { it.value }
             .map { (label, count) -> FileTypeChip(label, count, label in selectedFileTypes) }
 
-        // 4.3 Rebuild chip bar
         rebuildChipBar(chips)
 
-        // 4.4 Apply file-type filter
+        // 6.2 Apply file-type chip filter to both result types.
         val visible = if (selectedFileTypes.isEmpty()) {
-            searchFiltered
+            mergedResults
         } else {
-            searchFiltered.filter { FileTypeClassifier.classify(it.fileName) in selectedFileTypes }
+            mergedResults.filter { result ->
+                val fileType = when (result) {
+                    is EditTrailResult.HistoryResult ->
+                        FileTypeClassifier.classify(result.entry.fileName)
+                    is EditTrailResult.ProjectFileResult -> result.fileType
+                }
+                fileType in selectedFileTypes
+            }
         }
 
         model.clear()
@@ -236,19 +331,16 @@ class EditTrailPanel(
     private fun rebuildChipBar(chips: List<FileTypeChip>) {
         chipBarPanel.removeAll()
 
-        // 3.4 / 3.5  "All" button — appears bold when no type is selected
         val allButton = JButton("All")
         if (selectedFileTypes.isEmpty()) {
             allButton.font = allButton.font.deriveFont(java.awt.Font.BOLD)
         }
-        // 3.7 Wire All button to clear selection then refresh
         allButton.addActionListener {
             selectedFileTypes.clear()
             refresh()
         }
         chipBarPanel.add(allButton)
 
-        // 3.4 / 3.6  Per-type toggle buttons
         chips.forEach { chip ->
             val toggle = JToggleButton("${chip.label} (${chip.count})", chip.selected)
             toggle.addActionListener {
@@ -266,13 +358,29 @@ class EditTrailPanel(
     // ── Actions ──────────────────────────────────────────────────────────────────
 
     private fun openSelected() {
-        val entry = list.selectedValue ?: return
-        val vf = VirtualFileManager.getInstance().findFileByUrl(entry.fileUrl)
-        if (vf != null && vf.exists()) {
-            FileEditorManager.getInstance(project).openFile(vf, true)
-        } else {
-            entry.exists = false
-            refresh()
+        val result = list.selectedValue ?: return
+        // 7.1 Exhaustive when over EditTrailResult subtypes.
+        when (result) {
+            is EditTrailResult.HistoryResult -> {
+                // 7.2 Open history file as before.
+                val entry = result.entry
+                val vf = VirtualFileManager.getInstance().findFileByUrl(entry.fileUrl)
+                if (vf != null && vf.exists()) {
+                    FileEditorManager.getInstance(project).openFile(vf, true)
+                } else {
+                    entry.exists = false
+                    refresh()
+                }
+            }
+            is EditTrailResult.ProjectFileResult -> {
+                // 7.3 Open project file, add to history, then refresh.
+                val vf = result.virtualFile ?: return
+                if (vf.exists()) {
+                    FileEditorManager.getInstance(project).openFile(vf, true)
+                    project.service<EditTrailProjectService>().recordEdit(vf)
+                    // refresh() is triggered automatically by the HISTORY_UPDATED topic.
+                }
+            }
         }
     }
 
@@ -305,6 +413,7 @@ class EditTrailPanel(
         bar.add(matchContentBox)
         bar.add(regexBox)
         bar.add(caseSensitiveBox)
+        bar.add(globalSearchBox)
         return bar
     }
 

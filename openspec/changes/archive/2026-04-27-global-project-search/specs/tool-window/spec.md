@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Provide an EditTrail tool window
 The plugin SHALL provide a project-level tool window named `EditTrail` that renders the file history list with an integrated search bar, file-type chip bar, and global project search toggle.
