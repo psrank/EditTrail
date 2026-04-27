@@ -44,7 +44,14 @@ class EditTrailPanel(
 
     private val model = DefaultListModel<EditTrailResult>()
     private val list = JBList(model)
-    private var sortMode: SortMode = SortMode.LAST_EDITED
+    private var sortMode: SortMode = run {
+        try {
+            val s = EditTrailAppSettings.getInstance().state.defaultSortMode
+            if (s == "LAST_VIEWED") SortMode.LAST_VIEWED else SortMode.LAST_EDITED
+        } catch (_: Exception) {
+            SortMode.LAST_EDITED
+        }
+    }
 
     // ── Search state ─────────────────────────────────────────────────────────────
     private val searchField = JTextField()
@@ -103,6 +110,15 @@ class EditTrailPanel(
             onSearchChange()
         }
 
+        // Restore search toggles from app settings if persistence is enabled.
+        val appSettings = try { EditTrailAppSettings.getInstance().state } catch (_: Exception) { null }
+        if (appSettings?.persistSearchOptions == true) {
+            matchPathBox.isSelected = appSettings.matchPath
+            matchContentBox.isSelected = appSettings.matchContent
+            regexBox.isSelected = appSettings.regex
+            caseSensitiveBox.isSelected = appSettings.caseSensitive
+        }
+
         val northPanel = JPanel(GridLayout(4, 1))
         northPanel.add(createSortBar())
         northPanel.add(createSearchBar())
@@ -123,6 +139,16 @@ class EditTrailPanel(
 
     private fun onSearchChange() {
         updateRegexBorder()
+        // Persist search toggle state if the user has opted in.
+        try {
+            val s = EditTrailAppSettings.getInstance().state
+            if (s.persistSearchOptions) {
+                s.matchPath = matchPathBox.isSelected
+                s.matchContent = matchContentBox.isSelected
+                s.regex = regexBox.isSelected
+                s.caseSensitive = caseSensitiveBox.isSelected
+            }
+        } catch (_: Exception) { /* no-op outside IntelliJ context */ }
         debounceTimer.restart()
     }
 
@@ -167,6 +193,14 @@ class EditTrailPanel(
                 return@invokeLater
             } else {
                 allEntries.filter { SearchFilter.matches(it, options) }
+            }
+
+            // Dispatch group assignment off-EDT; repaint when done.
+            ApplicationManager.getApplication().executeOnPooledThread {
+                FileGrouper.assignGroups(allEntries)
+                ApplicationManager.getApplication().invokeLater {
+                    list.repaint()
+                }
             }
 
             // When global search is enabled and query is non-blank, fetch project files.
@@ -389,14 +423,41 @@ class EditTrailPanel(
     private fun createSortBar(): JPanel {
         val sortOptions = arrayOf("Last Edited", "Last Viewed")
         val combo = JComboBox(sortOptions)
-        combo.selectedIndex = 0
+        combo.selectedIndex = if (sortMode == SortMode.LAST_EDITED) 0 else 1
         combo.addActionListener {
             sortMode = if (combo.selectedIndex == 0) SortMode.LAST_EDITED else SortMode.LAST_VIEWED
             refresh()
         }
+
+        val recalcButton = JButton("Recalculate groups")
+        recalcButton.addActionListener {
+            val entries = project.service<EditTrailProjectService>().getHistory(sortMode)
+            ApplicationManager.getApplication().executeOnPooledThread {
+                FileGrouper.assignGroups(entries)
+                ApplicationManager.getApplication().invokeLater {
+                    list.repaint()
+                }
+            }
+        }
+
+        val clearButton = JButton("Clear history")
+        clearButton.addActionListener {
+            val choice = JOptionPane.showConfirmDialog(
+                this,
+                "Clear all EditTrail history for this project? This cannot be undone.",
+                "Clear History",
+                JOptionPane.YES_NO_OPTION
+            )
+            if (choice == JOptionPane.YES_OPTION) {
+                project.service<EditTrailProjectService>().clearHistory()
+            }
+        }
+
         val bar = JPanel(FlowLayout(FlowLayout.LEFT, 4, 2))
         bar.add(JBLabel("Sort:"))
         bar.add(combo)
+        bar.add(recalcButton)
+        bar.add(clearButton)
         return bar
     }
 

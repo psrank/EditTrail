@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * @param maxSize Maximum number of entries before LRU eviction kicks in (default 500).
  */
-class FileHistoryRepository(private val maxSize: Int = 500) {
+class FileHistoryRepository(private var maxSize: Int = 500) {
 
     // LinkedHashMap preserves insertion order; values are mutated in place for deduplication.
     private val entries = LinkedHashMap<String, FileHistoryEntry>()
@@ -80,6 +80,20 @@ class FileHistoryRepository(private val maxSize: Int = 500) {
     }
 
     // ── Persistence helpers ──────────────────────────────────────────────────────
+
+    /** Removes all entries from the history. */
+    fun clearAll() {
+        entries.clear()
+    }
+
+    /**
+     * Updates the maximum history size and immediately evicts oldest entries if
+     * the current count exceeds the new limit.
+     */
+    fun setMaxSize(newMax: Int) {
+        maxSize = newMax
+        evictIfNeeded()
+    }
 
     /** Replaces all entries with [entriesToLoad] (used during state restore). */
     fun loadEntries(entriesToLoad: List<FileHistoryEntry>) {

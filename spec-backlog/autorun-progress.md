@@ -1,6 +1,6 @@
 # OpenSpec Autorun Progress
 
-Last updated: 2026-04-27T02:30:00Z
+Last updated: 2026-04-27T09:30:00Z
 Session stages completed: 9
 
 ## Status Table
@@ -11,8 +11,8 @@ Session stages completed: 9
 | 002       | intuitive-search             | archive       | completed   | 2026-04-26 | 2026-04-26 |
 | 003       | file-type-filters            | archive       | completed   | 2026-04-26 | 2026-04-26 |
 | 004       | global-project-search        | archive       | completed   | 2026-04-27 | 2026-04-27 |
-| 005       | visual-grouping              | —             | pending |         |           |
-| 006       | settings-and-polish          | —             | pending |         |           |
+| 005       | visual-grouping              | archive       | completed   | 2026-04-27 | 2026-04-27 |
+| 006       | settings-and-polish          | archive       | completed   | 2026-04-27 | 2026-04-27 |
 
 ## Stage Detail
 
@@ -61,23 +61,23 @@ Session stages completed: 9
 - [x] archive
 
 ### 005 — visual-grouping
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] apply
-- [ ] tests-after
-- [ ] verify
-- [ ] verify-runtime
-- [ ] archive
+- [x] branch  <!-- feat/visual-grouping -->
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] apply
+- [x] tests-after
+- [x] verify
+- [ ] verify-runtime  <!-- SKIP: skill does not exist in this project -->
+- [x] archive
 
 ### 006 — settings-and-polish
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] apply
-- [ ] tests-after
-- [ ] verify
-- [ ] verify-runtime
-- [ ] archive
+- [x] branch  <!-- feat/settings-and-polish -->
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] apply
+- [x] tests-after
+- [x] verify
+- [ ] verify-runtime  <!-- SKIP: skill does not exist in this project -->
+- [x] archive

@@ -1,5 +1,7 @@
 package com.psrank.edittrail
 
+import com.intellij.util.xmlb.annotations.Transient
+
 /**
  * Represents a single file in the EditTrail history.
  *
@@ -15,4 +17,8 @@ data class FileHistoryEntry(
     var viewCount: Int = 0,
     var editCount: Int = 0,
     var exists: Boolean = true
-)
+) {
+    /** Session-scoped group identifier. Null means not grouped. Not persisted. */
+    @get:Transient
+    var groupId: Int? = null
+}

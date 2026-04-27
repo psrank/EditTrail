@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Provide an EditTrail tool window
 The plugin SHALL provide a project-level tool window named `EditTrail` that renders the file history list with an integrated search bar, file-type chip bar, global project search toggle, and group recalculation action.
@@ -26,11 +26,6 @@ The plugin SHALL provide a project-level tool window named `EditTrail` that rend
 #### Scenario: History panel includes a recalculate groups action
 - **WHEN** the user activates the EditTrail tool window
 - **THEN** the history panel SHALL display a "Recalculate groups" button or action
-
-#### Scenario: History panel includes a clear history action
-- **WHEN** the user activates the EditTrail tool window
-- **THEN** the history panel SHALL display a "Clear history" button
-- **AND** clicking it SHALL prompt the user for confirmation before clearing
 
 #### Scenario: Empty state is shown when no history exists
 - **WHEN** the EditTrail tool window is opened and the project has no recorded history
