@@ -68,6 +68,14 @@ class EditTrailProjectService(private val project: Project) :
     fun getHistory(sortMode: SortMode): List<FileHistoryEntry> =
         repository.getHistory(sortMode)
 
+    /** Returns the persisted global-search-enabled flag. */
+    fun isGlobalSearchEnabled(): Boolean = myState.globalSearchEnabled
+
+    /** Persists the global-search-enabled flag. */
+    fun setGlobalSearchEnabled(enabled: Boolean) {
+        myState.globalSearchEnabled = enabled
+    }
+
     /**
      * Resolves each persisted entry against the file system.
      * Sets [FileHistoryEntry.exists] = false for entries that no longer resolve.

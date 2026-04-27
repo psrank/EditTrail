@@ -1,15 +1,18 @@
 package com.psrank.edittrail
 
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.ui.JBColor
 import java.awt.Component
+import java.awt.Font
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JList
 
 /**
  * Cell renderer for the EditTrail history list.
  *
- * Displays a file-type icon (when the virtual file is resolvable), the file name
- * in bold, and the relative path in a lighter color.
+ * Handles two [EditTrailResult] subtypes:
+ * - [EditTrailResult.HistoryResult]: bold file name + grey relative path (unchanged behaviour)
+ * - [EditTrailResult.ProjectFileResult]: grey italic file name + "Project result" label
  */
 class FileHistoryCellRenderer : DefaultListCellRenderer() {
 
@@ -22,27 +25,58 @@ class FileHistoryCellRenderer : DefaultListCellRenderer() {
     ): Component {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
 
-        if (value is FileHistoryEntry) {
-            text = buildString {
-                append("<html><b>")
-                append(escapeHtml(value.fileName))
-                append("</b>")
-                if (value.relativePath.isNotBlank() && value.relativePath != value.fileName) {
-                    append("&nbsp;&nbsp;<font color='gray'>")
-                    append(escapeHtml(value.relativePath))
-                    append("</font>")
-                }
-                append("</html>")
-            }
-
-            // Resolve the icon from the virtual file's file type (best-effort; null is fine).
-            val vf = VirtualFileManager.getInstance().findFileByUrl(value.fileUrl)
-            icon = vf?.fileType?.icon
+        when (value) {
+            is EditTrailResult.HistoryResult -> renderHistoryResult(value)
+            is EditTrailResult.ProjectFileResult -> renderProjectResult(value)
+            // Legacy fallback — should not occur in normal operation.
+            is FileHistoryEntry -> renderLegacyEntry(value)
         }
 
         return this
     }
 
+    private fun renderHistoryResult(result: EditTrailResult.HistoryResult) {
+        val entry = result.entry
+        text = buildString {
+            append("<html><b>")
+            append(escapeHtml(entry.fileName))
+            append("</b>")
+            if (entry.relativePath.isNotBlank() && entry.relativePath != entry.fileName) {
+                append("&nbsp;&nbsp;<font color='gray'>")
+                append(escapeHtml(entry.relativePath))
+                append("</font>")
+            }
+            append("</html>")
+        }
+        val vf = VirtualFileManager.getInstance().findFileByUrl(entry.fileUrl)
+        icon = vf?.fileType?.icon
+    }
+
+    private fun renderProjectResult(result: EditTrailResult.ProjectFileResult) {
+        val gray = JBColor.GRAY
+        text = buildString {
+            append("<html><i><font color='#")
+            append(Integer.toHexString(gray.rgb and 0xFFFFFF))
+            append("'>")
+            append(escapeHtml(result.fileName))
+            append("</font></i>")
+            if (result.relativePath.isNotBlank() && result.relativePath != result.fileName) {
+                append("&nbsp;&nbsp;<font color='gray'>")
+                append(escapeHtml(result.relativePath))
+                append("</font>")
+            }
+            append("&nbsp;&nbsp;<font color='gray'><i>Project result</i></font>")
+            append("</html>")
+        }
+        icon = result.virtualFile?.fileType?.icon
+    }
+
+    /** Legacy path — renders a raw [FileHistoryEntry] if encountered. */
+    private fun renderLegacyEntry(entry: FileHistoryEntry) {
+        renderHistoryResult(EditTrailResult.HistoryResult(entry))
+    }
+
     private fun escapeHtml(text: String): String =
         text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 }
+
