@@ -82,16 +82,38 @@ class EditTrailPanelStructureTest {
     }
 
     @Test
-    fun `panel uses FileTypeChipLabel for chip rendering`() {
-        // Iteration 7 task 4.1: chip rendering routed through FileTypeChipLabel
-        // so the parens-free format is centralised.
+    fun `panel uses FileTypeChipLabel for chip tooltip and All-chip text`() {
+        // FileTypeChipLabel is now used for the chip tooltip text (full label + count)
+        // and for the All-chip's visible text. The chip face shows icon + count.
         assertTrue(
             panelSource.contains("FileTypeChipLabel.format("),
-            "EditTrailPanel.kt should render type chips via FileTypeChipLabel.format(...)."
+            "EditTrailPanel.kt should still call FileTypeChipLabel.format(...) (now as the chip tooltip)."
         )
         assertTrue(
             panelSource.contains("FileTypeChipLabel.formatAll("),
             "EditTrailPanel.kt should render the All chip via FileTypeChipLabel.formatAll(...)."
+        )
+    }
+
+    @Test
+    fun `type chips are rendered with icons via FileTypeChipIcon`() {
+        // The user-facing chip face must be icon-driven, not text-driven.
+        assertTrue(
+            panelSource.contains("FileTypeChipIcon.iconFor("),
+            "EditTrailPanel.kt should resolve each chip's icon via FileTypeChipIcon.iconFor(...)."
+        )
+    }
+
+    @Test
+    fun `type chip text is the count only, not the label`() {
+        // The chip's visible text should be just the count (the icon carries
+        // the type identity). Look for the JToggleButton constructed with
+        // chip.count.toString() as its text argument.
+        val pattern = Regex("""JToggleButton\s*\(\s*chip\.count\.toString\(\)""")
+        assertTrue(
+            pattern.containsMatchIn(panelSource),
+            "Type chips should be constructed with chip.count.toString() as their visible text " +
+            "and the icon supplied separately."
         )
     }
 

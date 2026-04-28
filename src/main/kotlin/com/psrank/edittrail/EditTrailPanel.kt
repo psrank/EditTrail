@@ -349,7 +349,9 @@ class EditTrailPanel(
     private fun rebuildChipBar(chips: List<FileTypeChip>) {
         chipBarPanel.removeAll()
 
+        // The "All" chip has no natural file-type glyph, so it keeps full text.
         val allButton = JButton(FileTypeChipLabel.formatAll(lastVisibleCount))
+        allButton.toolTipText = "All file types"
         if (selectedFileTypes.isEmpty()) {
             allButton.font = allButton.font.deriveFont(java.awt.Font.BOLD)
         }
@@ -360,7 +362,8 @@ class EditTrailPanel(
         chipBarPanel.add(allButton)
 
         chips.forEach { chip ->
-            val toggle = JToggleButton(FileTypeChipLabel.format(chip), chip.selected)
+            val toggle = JToggleButton(chip.count.toString(), FileTypeChipIcon.iconFor(chip.label), chip.selected)
+            toggle.toolTipText = FileTypeChipLabel.format(chip)
             toggle.addActionListener {
                 if (toggle.isSelected) selectedFileTypes.add(chip.label)
                 else selectedFileTypes.remove(chip.label)
