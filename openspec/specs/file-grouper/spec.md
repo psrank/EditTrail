@@ -1,5 +1,3 @@
-## ADDED Requirements
-
 ### Requirement: Assign group IDs to history entries
 The plugin SHALL assign a group ID (`groupId: Int`) to `FileHistoryEntry` objects that share strong co-occurrence signals. The group ID SHALL be session-scoped and NOT persisted across IDE restarts.
 
