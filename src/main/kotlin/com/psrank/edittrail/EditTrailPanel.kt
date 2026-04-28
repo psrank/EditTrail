@@ -25,7 +25,6 @@ import com.psrank.edittrail.actions.MatchPatternToggleAction
 import com.psrank.edittrail.actions.RecalculateGroupsAction
 import java.awt.BorderLayout
 import java.awt.FlowLayout
-import java.awt.GridLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
@@ -76,7 +75,7 @@ class EditTrailPanel(
 
     // ── File-type filter state ────────────────────────────────────────────────────
     private val selectedFileTypes: MutableSet<String> = mutableSetOf()
-    private val chipBarPanel = JPanel(FlowLayout(FlowLayout.LEFT, 4, 2))
+    private val chipBarPanel = JPanel(FlowLayout(FlowLayout.CENTER, 1, 6))
 
     /** Tracks the total visible result count for the `All` chip label. */
     private var lastVisibleCount: Int = 0
@@ -113,11 +112,18 @@ class EditTrailPanel(
             override fun changedUpdate(e: DocumentEvent) = onSearchChange()
         })
 
-        val northPanel = JPanel(GridLayout(4, 1))
-        northPanel.add(createSortBar())
-        northPanel.add(createSearchBar())
-        northPanel.add(createIconToolbar())
-        northPanel.add(createChipBarScrollPane())
+        val northPanel = JPanel()
+        northPanel.layout = BoxLayout(northPanel, BoxLayout.Y_AXIS)
+        // Each row sizes to its preferred height (no equal-share padding).
+        listOf(
+            createSortBar(),
+            createSearchBar(),
+            createIconToolbar(),
+            createChipBarComponent(),
+        ).forEach { row ->
+            row.alignmentX = java.awt.Component.LEFT_ALIGNMENT
+            northPanel.add(row)
+        }
 
         add(northPanel, BorderLayout.NORTH)
         add(JBScrollPane(list), BorderLayout.CENTER)
@@ -350,19 +356,24 @@ class EditTrailPanel(
         chipBarPanel.removeAll()
 
         // The "All" chip has no natural file-type glyph, so it keeps full text.
-        val allButton = JButton(FileTypeChipLabel.formatAll(lastVisibleCount))
-        allButton.toolTipText = "All file types"
-        if (selectedFileTypes.isEmpty()) {
-            allButton.font = allButton.font.deriveFont(java.awt.Font.BOLD)
-        }
-        allButton.addActionListener {
+        // It's a ChipButton with selected = (no type filters active).
+        val allChip = ChipButton(
+            text = FileTypeChipLabel.formatAll(lastVisibleCount),
+            selected = selectedFileTypes.isEmpty(),
+        )
+        allChip.toolTipText = "All file types"
+        allChip.addActionListener {
             selectedFileTypes.clear()
             refresh()
         }
-        chipBarPanel.add(allButton)
+        chipBarPanel.add(allChip)
 
         chips.forEach { chip ->
-            val toggle = JToggleButton(chip.count.toString(), FileTypeChipIcon.iconFor(chip.label), chip.selected)
+            val toggle = ChipButton(
+                text = chip.count.toString(),
+                icon = FileTypeChipIcon.iconFor(chip.label),
+                selected = chip.selected,
+            )
             toggle.toolTipText = FileTypeChipLabel.format(chip)
             toggle.addActionListener {
                 if (toggle.isSelected) selectedFileTypes.add(chip.label)
@@ -374,6 +385,9 @@ class EditTrailPanel(
 
         chipBarPanel.revalidate()
         chipBarPanel.repaint()
+        // Bubble revalidation up so the north panel re-allocates the chip
+        // bar's grown height after chips are added.
+        chipBarPanel.parent?.revalidate()
     }
 
     // ── Actions ──────────────────────────────────────────────────────────────────
@@ -470,12 +484,15 @@ class EditTrailPanel(
         return toolbar.component
     }
 
-    private fun createChipBarScrollPane(): JScrollPane {
-        val scroll = JScrollPane(chipBarPanel)
-        scroll.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
-        scroll.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_NEVER
-        scroll.border = null
-        return scroll
+    private fun createChipBarComponent(): JComponent {
+        // Thin top divider visually separates the chip bar from the icon
+        // toolbar above. Theme-aware so it survives both Light and Darcula.
+        val dividerColor = com.intellij.ui.JBColor(
+            java.awt.Color(0xD0D4DA),
+            java.awt.Color(0x393B40),
+        )
+        chipBarPanel.border = javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, dividerColor)
+        return chipBarPanel
     }
 
     companion object {

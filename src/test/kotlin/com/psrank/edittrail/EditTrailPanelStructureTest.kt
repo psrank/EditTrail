@@ -107,13 +107,23 @@ class EditTrailPanelStructureTest {
     @Test
     fun `type chip text is the count only, not the label`() {
         // The chip's visible text should be just the count (the icon carries
-        // the type identity). Look for the JToggleButton constructed with
+        // the type identity). Look for ChipButton constructed with
         // chip.count.toString() as its text argument.
-        val pattern = Regex("""JToggleButton\s*\(\s*chip\.count\.toString\(\)""")
+        val pattern = Regex("""ChipButton\s*\(\s*(?:[a-zA-Z]+\s*=\s*)?chip\.count\.toString\(\)""")
         assertTrue(
             pattern.containsMatchIn(panelSource),
             "Type chips should be constructed with chip.count.toString() as their visible text " +
             "and the icon supplied separately."
+        )
+    }
+
+    @Test
+    fun `chip bar uses the custom ChipButton class`() {
+        // ChipButton is the slim, selection-painting toggle used for both the
+        // All chip and each type chip.
+        assertTrue(
+            panelSource.contains("ChipButton("),
+            "EditTrailPanel.kt should use ChipButton for chip rendering."
         )
     }
 
