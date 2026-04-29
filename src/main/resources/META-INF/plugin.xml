@@ -18,6 +18,7 @@
             id="EditTrail"
             anchor="right"
             secondary="true"
+            icon="/icons/editTrailToolWindow.svg"
             factoryClass="com.psrank.edittrail.EditTrailToolWindowFactory"/>
 
         <!-- Application-level settings service — stores user preferences -->

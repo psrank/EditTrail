@@ -1,5 +1,3 @@
-## ADDED Requirements
-
 ### Requirement: Provide a clear history action
 The plugin SHALL provide a "Clear history" action in the EditTrail tool window that removes all history entries for the current project after user confirmation.
 

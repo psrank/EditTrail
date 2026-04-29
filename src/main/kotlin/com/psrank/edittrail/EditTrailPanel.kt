@@ -1,5 +1,8 @@
 package com.psrank.edittrail
 
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
@@ -12,9 +15,16 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
+import com.psrank.edittrail.actions.CaseSensitiveToggleAction
+import com.psrank.edittrail.actions.ClearHistoryAction
+import com.psrank.edittrail.actions.EditTrailToolbarState
+import com.psrank.edittrail.actions.GlobalSearchToggleAction
+import com.psrank.edittrail.actions.MatchContentToggleAction
+import com.psrank.edittrail.actions.MatchPathToggleAction
+import com.psrank.edittrail.actions.MatchPatternToggleAction
+import com.psrank.edittrail.actions.RecalculateGroupsAction
 import java.awt.BorderLayout
 import java.awt.FlowLayout
-import java.awt.GridLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
@@ -31,7 +41,7 @@ import javax.swing.event.DocumentListener
  * Layout (top to bottom):
  * 1. Sort combo (Last Edited / Last Viewed)
  * 2. Search field ("Search files…")
- * 3. Toggle row (Match path | Match content | Regex | Case sensitive | Include all project files)
+ * 3. Icon toolbar (path | content | regex | case sensitive | global | recalc | clear)
  * 4. File-type chip bar
  * 5. Scrollable [JBList] of [EditTrailResult] items
  *
@@ -55,15 +65,20 @@ class EditTrailPanel(
 
     // ── Search state ─────────────────────────────────────────────────────────────
     private val searchField = JTextField()
-    private val matchPathBox = JCheckBox("Match path")
-    private val matchContentBox = JCheckBox("Match content")
-    private val regexBox = JCheckBox("Regex")
-    private val caseSensitiveBox = JCheckBox("Case sensitive")
-    private val globalSearchBox = JCheckBox("Include all project files")
+
+    private val toolbarState: EditTrailToolbarState = EditTrailToolbarState(
+        project = project,
+        onSearchChange = { onSearchChange() },
+        onClearHistory = { promptAndClearHistory() },
+        onRecalculateGroups = { dispatchRecalculateGroups() },
+    )
 
     // ── File-type filter state ────────────────────────────────────────────────────
     private val selectedFileTypes: MutableSet<String> = mutableSetOf()
-    private val chipBarPanel = JPanel(FlowLayout(FlowLayout.LEFT, 4, 2))
+    private val chipBarPanel = JPanel(FlowLayout(FlowLayout.CENTER, 1, 6))
+
+    /** Tracks the total visible result count for the `All` chip label. */
+    private var lastVisibleCount: Int = 0
 
     /** Incremented on every search change to discard stale content-search results. */
     private val searchGeneration = AtomicInteger(0)
@@ -97,33 +112,18 @@ class EditTrailPanel(
             override fun changedUpdate(e: DocumentEvent) = onSearchChange()
         })
 
-        // Toggle checkboxes all trigger a refresh
-        listOf(matchPathBox, matchContentBox, regexBox, caseSensitiveBox).forEach { cb ->
-            cb.addActionListener { onSearchChange() }
+        val northPanel = JPanel()
+        northPanel.layout = BoxLayout(northPanel, BoxLayout.Y_AXIS)
+        // Each row sizes to its preferred height (no equal-share padding).
+        listOf(
+            createSortBar(),
+            createSearchBar(),
+            createIconToolbar(),
+            createChipBarComponent(),
+        ).forEach { row ->
+            row.alignmentX = java.awt.Component.LEFT_ALIGNMENT
+            northPanel.add(row)
         }
-
-        // Load persisted global-search toggle state and wire change listener
-        val svc = project.service<EditTrailProjectService>()
-        globalSearchBox.isSelected = svc.isGlobalSearchEnabled()
-        globalSearchBox.addActionListener {
-            svc.setGlobalSearchEnabled(globalSearchBox.isSelected)
-            onSearchChange()
-        }
-
-        // Restore search toggles from app settings if persistence is enabled.
-        val appSettings = try { EditTrailAppSettings.getInstance().state } catch (_: Exception) { null }
-        if (appSettings?.persistSearchOptions == true) {
-            matchPathBox.isSelected = appSettings.matchPath
-            matchContentBox.isSelected = appSettings.matchContent
-            regexBox.isSelected = appSettings.regex
-            caseSensitiveBox.isSelected = appSettings.caseSensitive
-        }
-
-        val northPanel = JPanel(GridLayout(4, 1))
-        northPanel.add(createSortBar())
-        northPanel.add(createSearchBar())
-        northPanel.add(createToggleBar())
-        northPanel.add(createChipBarScrollPane())
 
         add(northPanel, BorderLayout.NORTH)
         add(JBScrollPane(list), BorderLayout.CENTER)
@@ -139,21 +139,11 @@ class EditTrailPanel(
 
     private fun onSearchChange() {
         updateRegexBorder()
-        // Persist search toggle state if the user has opted in.
-        try {
-            val s = EditTrailAppSettings.getInstance().state
-            if (s.persistSearchOptions) {
-                s.matchPath = matchPathBox.isSelected
-                s.matchContent = matchContentBox.isSelected
-                s.regex = regexBox.isSelected
-                s.caseSensitive = caseSensitiveBox.isSelected
-            }
-        } catch (_: Exception) { /* no-op outside IntelliJ context */ }
         debounceTimer.restart()
     }
 
     private fun updateRegexBorder() {
-        if (regexBox.isSelected && !SearchFilter.isValidRegex(searchField.text)) {
+        if (toolbarState.regex && !SearchFilter.isValidRegex(searchField.text)) {
             searchField.border = LineBorder(JBColor.RED, 1)
         } else {
             searchField.border = defaultSearchBorder
@@ -162,10 +152,10 @@ class EditTrailPanel(
 
     private fun currentSearchOptions() = SearchOptions(
         query = searchField.text,
-        matchPath = matchPathBox.isSelected,
-        matchContent = matchContentBox.isSelected,
-        regex = regexBox.isSelected,
-        caseSensitive = caseSensitiveBox.isSelected
+        matchPath = toolbarState.matchPath,
+        matchContent = toolbarState.matchContent,
+        regex = toolbarState.regex,
+        caseSensitive = toolbarState.caseSensitive
     )
 
     // ── Refresh ──────────────────────────────────────────────────────────────────
@@ -204,7 +194,7 @@ class EditTrailPanel(
             }
 
             // When global search is enabled and query is non-blank, fetch project files.
-            if (globalSearchBox.isSelected && options.query.isNotBlank()) {
+            if (toolbarState.isGlobalSearchEnabled() && options.query.isNotBlank()) {
                 val historyUrls = allEntries.map { it.fileUrl }.toSet()
                 val generation = globalScanGeneration.incrementAndGet()
 
@@ -319,11 +309,9 @@ class EditTrailPanel(
         historyResults: List<FileHistoryEntry>,
         projectResults: List<EditTrailResult.ProjectFileResult> = emptyList()
     ) {
-        // 6.1 History first, then project file results.
         val mergedResults: List<EditTrailResult> =
             historyResults.map { EditTrailResult.HistoryResult(it) } + projectResults
 
-        // 6.3 Compute per-type counts across full merged set.
         val counts: Map<String, Int> = mergedResults.groupingBy { result ->
             when (result) {
                 is EditTrailResult.HistoryResult ->
@@ -336,9 +324,11 @@ class EditTrailPanel(
             .sortedByDescending { it.value }
             .map { (label, count) -> FileTypeChip(label, count, label in selectedFileTypes) }
 
+        // The All-chip count tracks the total across all types in the merged set.
+        lastVisibleCount = mergedResults.size
+
         rebuildChipBar(chips)
 
-        // 6.2 Apply file-type chip filter to both result types.
         val visible = if (selectedFileTypes.isEmpty()) {
             mergedResults
         } else {
@@ -365,18 +355,26 @@ class EditTrailPanel(
     private fun rebuildChipBar(chips: List<FileTypeChip>) {
         chipBarPanel.removeAll()
 
-        val allButton = JButton("All")
-        if (selectedFileTypes.isEmpty()) {
-            allButton.font = allButton.font.deriveFont(java.awt.Font.BOLD)
-        }
-        allButton.addActionListener {
+        // The "All" chip has no natural file-type glyph, so it keeps full text.
+        // It's a ChipButton with selected = (no type filters active).
+        val allChip = ChipButton(
+            text = FileTypeChipLabel.formatAll(lastVisibleCount),
+            selected = selectedFileTypes.isEmpty(),
+        )
+        allChip.toolTipText = "All file types"
+        allChip.addActionListener {
             selectedFileTypes.clear()
             refresh()
         }
-        chipBarPanel.add(allButton)
+        chipBarPanel.add(allChip)
 
         chips.forEach { chip ->
-            val toggle = JToggleButton("${chip.label} (${chip.count})", chip.selected)
+            val toggle = ChipButton(
+                text = chip.count.toString(),
+                icon = FileTypeChipIcon.iconFor(chip.label),
+                selected = chip.selected,
+            )
+            toggle.toolTipText = FileTypeChipLabel.format(chip)
             toggle.addActionListener {
                 if (toggle.isSelected) selectedFileTypes.add(chip.label)
                 else selectedFileTypes.remove(chip.label)
@@ -387,16 +385,17 @@ class EditTrailPanel(
 
         chipBarPanel.revalidate()
         chipBarPanel.repaint()
+        // Bubble revalidation up so the north panel re-allocates the chip
+        // bar's grown height after chips are added.
+        chipBarPanel.parent?.revalidate()
     }
 
     // ── Actions ──────────────────────────────────────────────────────────────────
 
     private fun openSelected() {
         val result = list.selectedValue ?: return
-        // 7.1 Exhaustive when over EditTrailResult subtypes.
         when (result) {
             is EditTrailResult.HistoryResult -> {
-                // 7.2 Open history file as before.
                 val entry = result.entry
                 val vf = VirtualFileManager.getInstance().findFileByUrl(entry.fileUrl)
                 if (vf != null && vf.exists()) {
@@ -407,14 +406,34 @@ class EditTrailPanel(
                 }
             }
             is EditTrailResult.ProjectFileResult -> {
-                // 7.3 Open project file, add to history, then refresh.
                 val vf = result.virtualFile ?: return
                 if (vf.exists()) {
                     FileEditorManager.getInstance(project).openFile(vf, true)
                     project.service<EditTrailProjectService>().recordEdit(vf)
-                    // refresh() is triggered automatically by the HISTORY_UPDATED topic.
                 }
             }
+        }
+    }
+
+    private fun dispatchRecalculateGroups() {
+        val entries = project.service<EditTrailProjectService>().getHistory(sortMode)
+        ApplicationManager.getApplication().executeOnPooledThread {
+            FileGrouper.assignGroups(entries)
+            ApplicationManager.getApplication().invokeLater {
+                list.repaint()
+            }
+        }
+    }
+
+    private fun promptAndClearHistory() {
+        val choice = JOptionPane.showConfirmDialog(
+            this,
+            "Clear all EditTrail history for this project? This cannot be undone.",
+            "Clear History",
+            JOptionPane.YES_NO_OPTION
+        )
+        if (choice == JOptionPane.YES_OPTION) {
+            project.service<EditTrailProjectService>().clearHistory()
         }
     }
 
@@ -429,35 +448,9 @@ class EditTrailPanel(
             refresh()
         }
 
-        val recalcButton = JButton("Recalculate groups")
-        recalcButton.addActionListener {
-            val entries = project.service<EditTrailProjectService>().getHistory(sortMode)
-            ApplicationManager.getApplication().executeOnPooledThread {
-                FileGrouper.assignGroups(entries)
-                ApplicationManager.getApplication().invokeLater {
-                    list.repaint()
-                }
-            }
-        }
-
-        val clearButton = JButton("Clear history")
-        clearButton.addActionListener {
-            val choice = JOptionPane.showConfirmDialog(
-                this,
-                "Clear all EditTrail history for this project? This cannot be undone.",
-                "Clear History",
-                JOptionPane.YES_NO_OPTION
-            )
-            if (choice == JOptionPane.YES_OPTION) {
-                project.service<EditTrailProjectService>().clearHistory()
-            }
-        }
-
         val bar = JPanel(FlowLayout(FlowLayout.LEFT, 4, 2))
         bar.add(JBLabel("Sort:"))
         bar.add(combo)
-        bar.add(recalcButton)
-        bar.add(clearButton)
         return bar
     }
 
@@ -468,21 +461,41 @@ class EditTrailPanel(
         return bar
     }
 
-    private fun createToggleBar(): JPanel {
-        val bar = JPanel(FlowLayout(FlowLayout.LEFT, 6, 2))
-        bar.add(matchPathBox)
-        bar.add(matchContentBox)
-        bar.add(regexBox)
-        bar.add(caseSensitiveBox)
-        bar.add(globalSearchBox)
-        return bar
+    /**
+     * Builds the icon-only `ActionToolbar` row containing the four search-option
+     * toggles, the global-search toggle, the recalculate-groups action, and the
+     * clear-history action.
+     */
+    private fun createIconToolbar(): JComponent {
+        val group = DefaultActionGroup().apply {
+            add(MatchPathToggleAction(toolbarState))
+            add(MatchContentToggleAction(toolbarState))
+            add(MatchPatternToggleAction(toolbarState))
+            add(CaseSensitiveToggleAction(toolbarState))
+            addSeparator()
+            add(GlobalSearchToggleAction(toolbarState))
+            addSeparator()
+            add(RecalculateGroupsAction(toolbarState))
+            add(ClearHistoryAction(toolbarState))
+        }
+        val toolbar = ActionManager.getInstance()
+            .createActionToolbar(TOOLBAR_PLACE, group, /* horizontal = */ true)
+        toolbar.targetComponent = this
+        return toolbar.component
     }
 
-    private fun createChipBarScrollPane(): JScrollPane {
-        val scroll = JScrollPane(chipBarPanel)
-        scroll.horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
-        scroll.verticalScrollBarPolicy = JScrollPane.VERTICAL_SCROLLBAR_NEVER
-        scroll.border = null
-        return scroll
+    private fun createChipBarComponent(): JComponent {
+        // Thin top divider visually separates the chip bar from the icon
+        // toolbar above. Theme-aware so it survives both Light and Darcula.
+        val dividerColor = com.intellij.ui.JBColor(
+            java.awt.Color(0xD0D4DA),
+            java.awt.Color(0x393B40),
+        )
+        chipBarPanel.border = javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, dividerColor)
+        return chipBarPanel
+    }
+
+    companion object {
+        const val TOOLBAR_PLACE = "EditTrail.IconToolbar"
     }
 }

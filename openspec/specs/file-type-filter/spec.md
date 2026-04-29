@@ -1,5 +1,3 @@
-## ADDED Requirements
-
 ### Requirement: Classify history entries by file type
 The plugin SHALL classify each history entry into a user-friendly file-type label based on its file extension.
 
