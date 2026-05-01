@@ -2,7 +2,6 @@ package com.psrank.edittrail
 
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.actionSystem.Separator
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
@@ -12,6 +11,7 @@ import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.ui.JBColor
+import com.intellij.util.ui.JBUI
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
@@ -92,6 +92,8 @@ class EditTrailPanel(
     private val defaultSearchBorder: javax.swing.border.Border = searchField.border
 
     init {
+        border = JBUI.Borders.empty(6)
+
         list.cellRenderer = FileHistoryCellRenderer()
 
         list.addMouseListener(object : MouseAdapter() {
@@ -121,7 +123,7 @@ class EditTrailPanel(
             createIconToolbar(),
             createChipBarComponent(),
         ).forEach { row ->
-            row.alignmentX = java.awt.Component.LEFT_ALIGNMENT
+            row.alignmentX = LEFT_ALIGNMENT
             northPanel.add(row)
         }
 
@@ -488,13 +490,13 @@ class EditTrailPanel(
         // Slightly stronger top divider visually separates the chip bar from
         // the search-toolbar actions above. Theme-aware so it survives both
         // Light and Darcula.
-        val dividerColor = com.intellij.ui.JBColor(
+        val dividerColor = JBColor(
             java.awt.Color(0xC2C8D1),
             java.awt.Color(0x4A5058),
         )
-        chipBarPanel.border = javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createMatteBorder(2, 0, 0, 0, dividerColor),
-            javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0),
+        chipBarPanel.border = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(2, 0, 0, 0, dividerColor),
+            BorderFactory.createEmptyBorder(3, 0, 0, 0),
         )
         return chipBarPanel
     }

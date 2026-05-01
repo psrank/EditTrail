@@ -82,6 +82,14 @@ class EditTrailPanelStructureTest {
     }
 
     @Test
+    fun `panel applies a small outer padding around the tool-window content`() {
+        assertTrue(
+            panelSource.contains("border = JBUI.Borders.empty(6)"),
+            "EditTrailPanel.kt should apply a small outer empty border so the tool window content is not flush to its edges."
+        )
+    }
+
+    @Test
     fun `panel uses FileTypeChipLabel for chip tooltip and All-chip text`() {
         // FileTypeChipLabel is now used for the chip tooltip text (full label + count)
         // and for the All-chip's visible text. The chip face shows icon + count.
@@ -130,7 +138,7 @@ class EditTrailPanelStructureTest {
     @Test
     fun `panel does not render chips with parenthesised count`() {
         // Defensive: catch a future regression that re-adds parens to chip labels.
-        val parensPattern = Regex("""\$\{chip\.label\}\s*\(\s*\$\{chip\.count\}\s*\)""")
+        val parensPattern = Regex("""\$\{chip\.label}\s*\(\s*\$\{chip\.count}\s*\)""")
         assertFalse(
             parensPattern.containsMatchIn(panelSource),
             "Chip label rendering must not wrap the count in parentheses (iteration 7 §4.1)."
