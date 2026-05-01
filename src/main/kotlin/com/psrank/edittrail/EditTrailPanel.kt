@@ -485,13 +485,17 @@ class EditTrailPanel(
     }
 
     private fun createChipBarComponent(): JComponent {
-        // Thin top divider visually separates the chip bar from the icon
-        // toolbar above. Theme-aware so it survives both Light and Darcula.
+        // Slightly stronger top divider visually separates the chip bar from
+        // the search-toolbar actions above. Theme-aware so it survives both
+        // Light and Darcula.
         val dividerColor = com.intellij.ui.JBColor(
-            java.awt.Color(0xD0D4DA),
-            java.awt.Color(0x393B40),
+            java.awt.Color(0xC2C8D1),
+            java.awt.Color(0x4A5058),
         )
-        chipBarPanel.border = javax.swing.BorderFactory.createMatteBorder(1, 0, 0, 0, dividerColor)
+        chipBarPanel.border = javax.swing.BorderFactory.createCompoundBorder(
+            javax.swing.BorderFactory.createMatteBorder(2, 0, 0, 0, dividerColor),
+            javax.swing.BorderFactory.createEmptyBorder(3, 0, 0, 0),
+        )
         return chipBarPanel
     }
 
