@@ -73,10 +73,10 @@ class ChipButton(
     }
 
     companion object {
-        private const val PAD_X = 3
+        private const val PAD_X = 5
         // 2 instead of 1 so the inset rounded-rect background has room to draw
         // a 1px stroke at the top and bottom without being clipped.
-        private const val PAD_Y = 2
+        private const val PAD_Y = 3
         private const val ARC = 8
         private val SELECTED_FILL = JBColor(Color(0xC8D4E8), Color(0x44546B))
         private val SELECTED_STROKE = JBColor(Color(0x6E8FCF), Color(0xAFC2E6))
