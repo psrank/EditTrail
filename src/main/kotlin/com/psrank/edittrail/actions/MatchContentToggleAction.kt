@@ -1,12 +1,15 @@
 package com.psrank.edittrail.actions
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.ToggleAction
 
 class MatchContentToggleAction(
     private val state: EditTrailToolbarState,
 ) : ToggleAction("Match content", DESCRIPTION, AllIcons.Actions.Find) {
+
+    override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     override fun isSelected(e: AnActionEvent): Boolean = state.matchContent
 

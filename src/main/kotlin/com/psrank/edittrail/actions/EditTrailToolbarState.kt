@@ -22,9 +22,13 @@ class EditTrailToolbarState(
     val onClearHistory: () -> Unit,
     val onRecalculateGroups: () -> Unit,
 ) {
+    @Volatile
     var matchPath: Boolean = false
+    @Volatile
     var matchContent: Boolean = false
+    @Volatile
     var regex: Boolean = false
+    @Volatile
     var caseSensitive: Boolean = false
 
     init {

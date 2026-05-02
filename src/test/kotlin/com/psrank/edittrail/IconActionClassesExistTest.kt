@@ -1,9 +1,14 @@
 package com.psrank.edittrail
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.project.Project
+import com.psrank.edittrail.actions.EditTrailToolbarState
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.lang.reflect.Proxy
 
 /**
  * TDD-first tests for iteration 7's action classes.
@@ -44,6 +49,34 @@ class IconActionClassesExistTest {
             c = c.superclass
         }
         return names.joinToString(" -> ")
+    }
+
+    private fun testToolbarState(): EditTrailToolbarState {
+        val project = Proxy.newProxyInstance(
+            Project::class.java.classLoader,
+            arrayOf(Project::class.java),
+        ) { proxy, method, args ->
+            when (method.name) {
+                "equals" -> proxy === args?.firstOrNull()
+                "hashCode" -> System.identityHashCode(proxy)
+                "toString" -> "TestProject"
+                else -> throw UnsupportedOperationException("Unexpected Project call in action update-thread test: ${method.name}")
+            }
+        } as Project
+
+        return EditTrailToolbarState(
+            project = project,
+            onSearchChange = {},
+            onClearHistory = {},
+            onRecalculateGroups = {},
+        )
+    }
+
+    private fun assertActionUsesBackgroundUpdates(fqn: String) {
+        val cls = Class.forName(fqn).asSubclass(AnAction::class.java)
+        val action = cls.getConstructor(EditTrailToolbarState::class.java)
+            .newInstance(testToolbarState())
+        assertEquals(ActionUpdateThread.BGT, action.actionUpdateThread, "$fqn should update on BGT")
     }
 
     @Test
@@ -132,5 +165,19 @@ class IconActionClassesExistTest {
             value
         }
         assertEquals(descriptions.size, descriptions.toSet().size, "Action descriptions are not unique: $descriptions")
+    }
+
+    @Test
+    fun `every toolbar action declares background update thread`() {
+        val fqns = listOf(
+            "com.psrank.edittrail.actions.MatchPathToggleAction",
+            "com.psrank.edittrail.actions.MatchContentToggleAction",
+            "com.psrank.edittrail.actions.MatchPatternToggleAction",
+            "com.psrank.edittrail.actions.CaseSensitiveToggleAction",
+            "com.psrank.edittrail.actions.GlobalSearchToggleAction",
+            "com.psrank.edittrail.actions.RecalculateGroupsAction",
+            "com.psrank.edittrail.actions.ClearHistoryAction",
+        )
+        fqns.forEach(::assertActionUsesBackgroundUpdates)
     }
 }

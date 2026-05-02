@@ -9,5 +9,6 @@ package com.psrank.edittrail
  */
 class FileHistoryState {
     var entries: MutableList<FileHistoryEntry> = mutableListOf()
+    @Volatile
     var globalSearchEnabled: Boolean = false
 }

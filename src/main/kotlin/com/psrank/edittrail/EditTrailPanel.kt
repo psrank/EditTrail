@@ -1,11 +1,11 @@
 package com.psrank.edittrail
 
 import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.components.service
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -401,7 +401,7 @@ class EditTrailPanel(
                 val entry = result.entry
                 val vf = VirtualFileManager.getInstance().findFileByUrl(entry.fileUrl)
                 if (vf != null && vf.exists()) {
-                    FileEditorManager.getInstance(project).openFile(vf, true)
+                    FileOpenNavigator.open(project, vf)
                 } else {
                     entry.exists = false
                     refresh()
@@ -410,7 +410,7 @@ class EditTrailPanel(
             is EditTrailResult.ProjectFileResult -> {
                 val vf = result.virtualFile ?: return
                 if (vf.exists()) {
-                    FileEditorManager.getInstance(project).openFile(vf, true)
+                    FileOpenNavigator.open(project, vf)
                     project.service<EditTrailProjectService>().recordEdit(vf)
                 }
             }
@@ -469,7 +469,9 @@ class EditTrailPanel(
      * clear-history action.
      */
     private fun createIconToolbar(): JComponent {
-        val group = DefaultActionGroup().apply {
+        val group = object : DefaultActionGroup() {
+            override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
+        }.apply {
             add(MatchPathToggleAction(toolbarState))
             add(MatchContentToggleAction(toolbarState))
             add(MatchPatternToggleAction(toolbarState))

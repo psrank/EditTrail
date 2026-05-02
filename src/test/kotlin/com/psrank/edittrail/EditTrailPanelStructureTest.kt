@@ -82,6 +82,16 @@ class EditTrailPanelStructureTest {
     }
 
     @Test
+    fun `icon toolbar action group expands on background thread`() {
+        assertTrue(
+            panelSource.contains("object : DefaultActionGroup()") &&
+                panelSource.contains("ActionUpdateThread.BGT"),
+            "EditTrailPanel.kt should declare the icon toolbar group update thread as BGT " +
+                "so ActionUpdater does not grab the EDT while expanding it."
+        )
+    }
+
+    @Test
     fun `panel applies a small outer padding around the tool-window content`() {
         assertTrue(
             panelSource.contains("border = JBUI.Borders.empty(6)"),
