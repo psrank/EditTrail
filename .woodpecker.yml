@@ -1,0 +1,7 @@
+steps:
+  ci:
+    image: eclipse-temurin:21-jdk
+    commands:
+      - chmod +x ./gradlew
+      - chmod +x ./build/ci.sh
+      - ./build/ci.sh

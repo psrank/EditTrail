@@ -1,5 +1,8 @@
 # Gradle build output
-build/
+build/*
+!build/
+!build/ci.sh
+!build/ci.ps1
 .gradle/
 
 # IntelliJ Platform Gradle Plugin cache (downloaded IDE, sandbox)
@@ -23,3 +26,7 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Local autorun/session cache
+.tmp/
+spec-backlog/.autorun-token-cursor.json

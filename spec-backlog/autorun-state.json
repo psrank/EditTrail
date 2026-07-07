@@ -1,0 +1,422 @@
+{
+  "version": 1,
+  "tool": "openspec",
+  "updated": "2026-07-07T19:36:07+01:00",
+  "pipeline": [
+    "branch",
+    "propose",
+    "review",
+    "tests-before",
+    "gitignore",
+    "apply",
+    "tests-after",
+    "lint",
+    "contracts-validate",
+    "verify",
+    "verify-runtime",
+    "tasks-audit",
+    "archive",
+    "commit"
+  ],
+  "iterations": [
+    {
+      "id": "001",
+      "change_name": "edittrail-iteration-1-core-history",
+      "propose_file": "spec-backlog/iteration-1-core-history.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/001-edittrail-iteration-1-core-history",
+      "status": "skipped",
+      "started": "2026-07-07T19:36:07+01:00",
+      "completed": null,
+      "notes": "Skipped: equivalent core-history change is already archived at openspec/changes/archive/2026-04-26-core-history and implemented on main; replaying it could overwrite later active spec requirements.",
+      "current_stage": "branch",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "todo"
+        },
+        "review": {
+          "state": "todo"
+        },
+        "tests-before": {
+          "state": "todo"
+        },
+        "gitignore": {
+          "state": "todo"
+        },
+        "apply": {
+          "state": "todo"
+        },
+        "tests-after": {
+          "state": "todo"
+        },
+        "lint": {
+          "state": "todo"
+        },
+        "contracts-validate": {
+          "state": "todo"
+        },
+        "verify": {
+          "state": "todo"
+        },
+        "verify-runtime": {
+          "state": "todo"
+        },
+        "tasks-audit": {
+          "state": "todo"
+        },
+        "archive": {
+          "state": "todo"
+        },
+        "commit": {
+          "state": "todo"
+        }
+      }
+    },
+    {
+      "id": "002",
+      "change_name": "edittrail-iteration-2-intuitive-search",
+      "propose_file": "spec-backlog/iteration-2-intuitive-search.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": null,
+      "status": "skipped",
+      "started": null,
+      "completed": null,
+      "notes": "Skipped: equivalent intuitive-search change is already archived at openspec/changes/archive/2026-04-26-intuitive-search and implemented on main.",
+      "current_stage": null,
+      "stages": {
+        "branch": {
+          "state": "todo"
+        },
+        "propose": {
+          "state": "todo"
+        },
+        "review": {
+          "state": "todo"
+        },
+        "tests-before": {
+          "state": "todo"
+        },
+        "gitignore": {
+          "state": "todo"
+        },
+        "apply": {
+          "state": "todo"
+        },
+        "tests-after": {
+          "state": "todo"
+        },
+        "lint": {
+          "state": "todo"
+        },
+        "contracts-validate": {
+          "state": "todo"
+        },
+        "verify": {
+          "state": "todo"
+        },
+        "verify-runtime": {
+          "state": "todo"
+        },
+        "tasks-audit": {
+          "state": "todo"
+        },
+        "archive": {
+          "state": "todo"
+        },
+        "commit": {
+          "state": "todo"
+        }
+      }
+    },
+    {
+      "id": "003",
+      "change_name": "edittrail-iteration-3-file-type-filters",
+      "propose_file": "spec-backlog/iteration-3-file-type-filters.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": null,
+      "status": "skipped",
+      "started": null,
+      "completed": null,
+      "notes": "Skipped: equivalent file-type-filters change is already archived at openspec/changes/archive/2026-04-26-file-type-filters and implemented on main.",
+      "current_stage": null,
+      "stages": {
+        "branch": {
+          "state": "todo"
+        },
+        "propose": {
+          "state": "todo"
+        },
+        "review": {
+          "state": "todo"
+        },
+        "tests-before": {
+          "state": "todo"
+        },
+        "gitignore": {
+          "state": "todo"
+        },
+        "apply": {
+          "state": "todo"
+        },
+        "tests-after": {
+          "state": "todo"
+        },
+        "lint": {
+          "state": "todo"
+        },
+        "contracts-validate": {
+          "state": "todo"
+        },
+        "verify": {
+          "state": "todo"
+        },
+        "verify-runtime": {
+          "state": "todo"
+        },
+        "tasks-audit": {
+          "state": "todo"
+        },
+        "archive": {
+          "state": "todo"
+        },
+        "commit": {
+          "state": "todo"
+        }
+      }
+    },
+    {
+      "id": "004",
+      "change_name": "edittrail-iteration-4-global-project-search",
+      "propose_file": "spec-backlog/iteration-4-global-project-search.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": null,
+      "status": "skipped",
+      "started": null,
+      "completed": null,
+      "notes": "Skipped: equivalent global-project-search change is already archived at openspec/changes/archive/2026-04-27-global-project-search and implemented on main.",
+      "current_stage": null,
+      "stages": {
+        "branch": {
+          "state": "todo"
+        },
+        "propose": {
+          "state": "todo"
+        },
+        "review": {
+          "state": "todo"
+        },
+        "tests-before": {
+          "state": "todo"
+        },
+        "gitignore": {
+          "state": "todo"
+        },
+        "apply": {
+          "state": "todo"
+        },
+        "tests-after": {
+          "state": "todo"
+        },
+        "lint": {
+          "state": "todo"
+        },
+        "contracts-validate": {
+          "state": "todo"
+        },
+        "verify": {
+          "state": "todo"
+        },
+        "verify-runtime": {
+          "state": "todo"
+        },
+        "tasks-audit": {
+          "state": "todo"
+        },
+        "archive": {
+          "state": "todo"
+        },
+        "commit": {
+          "state": "todo"
+        }
+      }
+    },
+    {
+      "id": "005",
+      "change_name": "edittrail-iteration-5-visual-grouping",
+      "propose_file": "spec-backlog/iteration-5-visual-grouping.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": null,
+      "status": "skipped",
+      "started": null,
+      "completed": null,
+      "notes": "Skipped: equivalent visual-grouping change is already archived at openspec/changes/archive/2026-04-26-visual-grouping and implemented on main.",
+      "current_stage": null,
+      "stages": {
+        "branch": {
+          "state": "todo"
+        },
+        "propose": {
+          "state": "todo"
+        },
+        "review": {
+          "state": "todo"
+        },
+        "tests-before": {
+          "state": "todo"
+        },
+        "gitignore": {
+          "state": "todo"
+        },
+        "apply": {
+          "state": "todo"
+        },
+        "tests-after": {
+          "state": "todo"
+        },
+        "lint": {
+          "state": "todo"
+        },
+        "contracts-validate": {
+          "state": "todo"
+        },
+        "verify": {
+          "state": "todo"
+        },
+        "verify-runtime": {
+          "state": "todo"
+        },
+        "tasks-audit": {
+          "state": "todo"
+        },
+        "archive": {
+          "state": "todo"
+        },
+        "commit": {
+          "state": "todo"
+        }
+      }
+    },
+    {
+      "id": "006",
+      "change_name": "edittrail-iteration-6-settings-and-polish",
+      "propose_file": "spec-backlog/iteration-6-settings-and-polish.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": null,
+      "status": "skipped",
+      "started": null,
+      "completed": null,
+      "notes": "Skipped: equivalent settings-and-polish change is already archived at openspec/changes/archive/2026-04-27-settings-and-polish and implemented on main.",
+      "current_stage": null,
+      "stages": {
+        "branch": {
+          "state": "todo"
+        },
+        "propose": {
+          "state": "todo"
+        },
+        "review": {
+          "state": "todo"
+        },
+        "tests-before": {
+          "state": "todo"
+        },
+        "gitignore": {
+          "state": "todo"
+        },
+        "apply": {
+          "state": "todo"
+        },
+        "tests-after": {
+          "state": "todo"
+        },
+        "lint": {
+          "state": "todo"
+        },
+        "contracts-validate": {
+          "state": "todo"
+        },
+        "verify": {
+          "state": "todo"
+        },
+        "verify-runtime": {
+          "state": "todo"
+        },
+        "tasks-audit": {
+          "state": "todo"
+        },
+        "archive": {
+          "state": "todo"
+        },
+        "commit": {
+          "state": "todo"
+        }
+      }
+    },
+    {
+      "id": "007",
+      "change_name": "iteration-7-ui-icon-refinement-md",
+      "propose_file": "spec-backlog/iteration-7-ui-icon-refinement.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": null,
+      "status": "skipped",
+      "started": null,
+      "completed": null,
+      "notes": "Skipped: equivalent ui-icon-refinement change is already archived at openspec/changes/archive/2026-04-28-ui-icon-refinement and implemented on main.",
+      "current_stage": null,
+      "stages": {
+        "branch": {
+          "state": "todo"
+        },
+        "propose": {
+          "state": "todo"
+        },
+        "review": {
+          "state": "todo"
+        },
+        "tests-before": {
+          "state": "todo"
+        },
+        "gitignore": {
+          "state": "todo"
+        },
+        "apply": {
+          "state": "todo"
+        },
+        "tests-after": {
+          "state": "todo"
+        },
+        "lint": {
+          "state": "todo"
+        },
+        "contracts-validate": {
+          "state": "todo"
+        },
+        "verify": {
+          "state": "todo"
+        },
+        "verify-runtime": {
+          "state": "todo"
+        },
+        "tasks-audit": {
+          "state": "todo"
+        },
+        "archive": {
+          "state": "todo"
+        },
+        "commit": {
+          "state": "todo"
+        }
+      }
+    }
+  ]
+}
