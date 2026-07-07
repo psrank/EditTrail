@@ -1,3 +1,5 @@
+/opsx:propose settings-and-polish
+
 # EditTrail — Iteration 6: Settings and Polish
 
 ## Goal

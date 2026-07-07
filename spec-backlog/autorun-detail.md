@@ -6,115 +6,115 @@ Last updated: 2026-07-07T19:36:07+01:00
 
 ## Stage Detail
 
-### 001 — edittrail-iteration-1-core-history
+### 001 — core-history
 - [x] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] gitignore
-- [ ] apply
-- [ ] tests-after
-- [ ] lint
-- [ ] contracts-validate
-- [ ] verify
-- [ ] verify-runtime
-- [ ] tasks-audit
-- [ ] archive
-- [ ] commit
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] gitignore
+- [x] apply
+- [x] tests-after
+- [x] lint
+- [x] contracts-validate
+- [x] verify
+- [x] verify-runtime
+- [x] tasks-audit
+- [x] archive
+- [x] commit
 
-### 002 — edittrail-iteration-2-intuitive-search
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] gitignore
-- [ ] apply
-- [ ] tests-after
-- [ ] lint
-- [ ] contracts-validate
-- [ ] verify
-- [ ] verify-runtime
-- [ ] tasks-audit
-- [ ] archive
-- [ ] commit
+### 002 — intuitive-search
+- [x] branch
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] gitignore
+- [x] apply
+- [x] tests-after
+- [x] lint
+- [x] contracts-validate
+- [x] verify
+- [x] verify-runtime
+- [x] tasks-audit
+- [x] archive
+- [x] commit
 
-### 003 — edittrail-iteration-3-file-type-filters
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] gitignore
-- [ ] apply
-- [ ] tests-after
-- [ ] lint
-- [ ] contracts-validate
-- [ ] verify
-- [ ] verify-runtime
-- [ ] tasks-audit
-- [ ] archive
-- [ ] commit
+### 003 — file-type-filters
+- [x] branch
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] gitignore
+- [x] apply
+- [x] tests-after
+- [x] lint
+- [x] contracts-validate
+- [x] verify
+- [x] verify-runtime
+- [x] tasks-audit
+- [x] archive
+- [x] commit
 
-### 004 — edittrail-iteration-4-global-project-search
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] gitignore
-- [ ] apply
-- [ ] tests-after
-- [ ] lint
-- [ ] contracts-validate
-- [ ] verify
-- [ ] verify-runtime
-- [ ] tasks-audit
-- [ ] archive
-- [ ] commit
+### 004 — global-project-search
+- [x] branch
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] gitignore
+- [x] apply
+- [x] tests-after
+- [x] lint
+- [x] contracts-validate
+- [x] verify
+- [x] verify-runtime
+- [x] tasks-audit
+- [x] archive
+- [x] commit
 
-### 005 — edittrail-iteration-5-visual-grouping
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] gitignore
-- [ ] apply
-- [ ] tests-after
-- [ ] lint
-- [ ] contracts-validate
-- [ ] verify
-- [ ] verify-runtime
-- [ ] tasks-audit
-- [ ] archive
-- [ ] commit
+### 005 — visual-grouping
+- [x] branch
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] gitignore
+- [x] apply
+- [x] tests-after
+- [x] lint
+- [x] contracts-validate
+- [x] verify
+- [x] verify-runtime
+- [x] tasks-audit
+- [x] archive
+- [x] commit
 
-### 006 — edittrail-iteration-6-settings-and-polish
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] gitignore
-- [ ] apply
-- [ ] tests-after
-- [ ] lint
-- [ ] contracts-validate
-- [ ] verify
-- [ ] verify-runtime
-- [ ] tasks-audit
-- [ ] archive
-- [ ] commit
+### 006 — settings-and-polish
+- [x] branch
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] gitignore
+- [x] apply
+- [x] tests-after
+- [x] lint
+- [x] contracts-validate
+- [x] verify
+- [x] verify-runtime
+- [x] tasks-audit
+- [x] archive
+- [x] commit
 
-### 007 — iteration-7-ui-icon-refinement-md
-- [ ] branch
-- [ ] propose
-- [ ] review
-- [ ] tests-before
-- [ ] gitignore
-- [ ] apply
-- [ ] tests-after
-- [ ] lint
-- [ ] contracts-validate
-- [ ] verify
-- [ ] verify-runtime
-- [ ] tasks-audit
-- [ ] archive
-- [ ] commit
+### 007 — ui-icon-refinement
+- [x] branch
+- [x] propose
+- [x] review
+- [x] tests-before
+- [x] gitignore
+- [x] apply
+- [x] tests-after
+- [x] lint
+- [x] contracts-validate
+- [x] verify
+- [x] verify-runtime
+- [x] tasks-audit
+- [x] archive
+- [x] commit
 

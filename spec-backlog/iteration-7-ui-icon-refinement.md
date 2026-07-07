@@ -1,3 +1,5 @@
+/opsx:propose ui-icon-refinement
+
 # 📄 `iteration-7-ui-icon-refinement.md`
 
 ````md

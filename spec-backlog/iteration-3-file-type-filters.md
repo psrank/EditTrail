@@ -1,3 +1,5 @@
+/opsx:propose file-type-filters
+
 # EditTrail — Iteration 3: File Type Filters
 
 ## Goal

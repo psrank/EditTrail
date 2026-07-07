@@ -1,20 +1,5 @@
 # spec-backlog/autorun-tokens.yml
-# Generated from autorun-tokens.json by autorun.py — do not edit by hand.
+# Generated from autorun-tokens.json by autorun.py - do not edit by hand.
 last_updated: 2026-07-07T19:36:07+01:00
 
-iterations:
-  "001":
-    change_name: edittrail-iteration-1-core-history
-    totals:
-      input: 0
-      output: 0
-      cached: 0
-      source: codex
-    stages:
-      branch:
-        - session: "2026-07-07T19:36:07+01:00"
-          input: 0
-          output: 0
-          cached: 0
-          source: codex
-          attempt: 1
+iterations: {}
