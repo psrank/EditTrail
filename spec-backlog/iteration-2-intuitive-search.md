@@ -1,3 +1,5 @@
+/opsx:propose intuitive-search
+
 # EditTrail — Iteration 2: Intuitive Search
 
 ## Goal

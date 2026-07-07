@@ -1,3 +1,5 @@
+/opsx:propose global-project-search
+
 # EditTrail — Iteration 4: Global Project Search
 
 ## Goal

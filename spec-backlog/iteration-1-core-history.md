@@ -1,3 +1,5 @@
+/opsx:propose core-history
+
 # EditTrail — Iteration 1: Core History
 
 ## Goal

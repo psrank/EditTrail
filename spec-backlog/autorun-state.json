@@ -1,0 +1,423 @@
+{
+  "version": 1,
+  "tool": "openspec",
+  "updated": "2026-07-07T19:36:07+01:00",
+  "pipeline": [
+    "branch",
+    "propose",
+    "review",
+    "tests-before",
+    "gitignore",
+    "apply",
+    "tests-after",
+    "lint",
+    "contracts-validate",
+    "verify",
+    "verify-runtime",
+    "tasks-audit",
+    "archive",
+    "commit"
+  ],
+  "iterations": [
+    {
+      "id": "001",
+      "change_name": "core-history",
+      "propose_file": "spec-backlog/iteration-1-core-history.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/core-history",
+      "status": "complete",
+      "started": "2026-04-26",
+      "completed": "2026-04-26",
+      "notes": "Migrated from legacy autorun-progress.md: completed through archive; archived at openspec/changes/archive/2026-04-26-core-history; implementation already present on main. New-format stages are marked satisfied to prevent replay.",
+      "current_stage": "archive",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "done"
+        },
+        "review": {
+          "state": "done"
+        },
+        "tests-before": {
+          "state": "done"
+        },
+        "gitignore": {
+          "state": "done"
+        },
+        "apply": {
+          "state": "done"
+        },
+        "tests-after": {
+          "state": "done"
+        },
+        "lint": {
+          "state": "done"
+        },
+        "contracts-validate": {
+          "state": "done"
+        },
+        "verify": {
+          "state": "done"
+        },
+        "verify-runtime": {
+          "state": "done"
+        },
+        "tasks-audit": {
+          "state": "done"
+        },
+        "archive": {
+          "state": "done"
+        },
+        "commit": {
+          "state": "done"
+        }
+      }
+    },
+    {
+      "id": "002",
+      "change_name": "intuitive-search",
+      "propose_file": "spec-backlog/iteration-2-intuitive-search.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/intuitive-search",
+      "status": "complete",
+      "started": "2026-04-26",
+      "completed": "2026-04-26",
+      "notes": "Migrated from legacy autorun-progress.md: completed through archive; archived at openspec/changes/archive/2026-04-26-intuitive-search; implementation already present on main. New-format stages are marked satisfied to prevent replay.",
+      "current_stage": "archive",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "done"
+        },
+        "review": {
+          "state": "done"
+        },
+        "tests-before": {
+          "state": "done"
+        },
+        "gitignore": {
+          "state": "done"
+        },
+        "apply": {
+          "state": "done"
+        },
+        "tests-after": {
+          "state": "done"
+        },
+        "lint": {
+          "state": "done"
+        },
+        "contracts-validate": {
+          "state": "done"
+        },
+        "verify": {
+          "state": "done"
+        },
+        "verify-runtime": {
+          "state": "done"
+        },
+        "tasks-audit": {
+          "state": "done"
+        },
+        "archive": {
+          "state": "done"
+        },
+        "commit": {
+          "state": "done"
+        }
+      }
+    },
+    {
+      "id": "003",
+      "change_name": "file-type-filters",
+      "propose_file": "spec-backlog/iteration-3-file-type-filters.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/file-type-filters",
+      "status": "complete",
+      "started": "2026-04-26",
+      "completed": "2026-04-26",
+      "notes": "Migrated from legacy autorun-progress.md: completed through archive; archived at openspec/changes/archive/2026-04-26-file-type-filters; implementation already present on main. New-format stages are marked satisfied to prevent replay.",
+      "current_stage": "archive",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "done"
+        },
+        "review": {
+          "state": "done"
+        },
+        "tests-before": {
+          "state": "done"
+        },
+        "gitignore": {
+          "state": "done"
+        },
+        "apply": {
+          "state": "done"
+        },
+        "tests-after": {
+          "state": "done"
+        },
+        "lint": {
+          "state": "done"
+        },
+        "contracts-validate": {
+          "state": "done"
+        },
+        "verify": {
+          "state": "done"
+        },
+        "verify-runtime": {
+          "state": "done"
+        },
+        "tasks-audit": {
+          "state": "done"
+        },
+        "archive": {
+          "state": "done"
+        },
+        "commit": {
+          "state": "done"
+        }
+      }
+    },
+    {
+      "id": "004",
+      "change_name": "global-project-search",
+      "propose_file": "spec-backlog/iteration-4-global-project-search.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/global-project-search",
+      "status": "complete",
+      "started": "2026-04-27",
+      "completed": "2026-04-27",
+      "notes": "Migrated from legacy autorun-progress.md: completed through archive; archived at openspec/changes/archive/2026-04-27-global-project-search; implementation already present on main. New-format stages are marked satisfied to prevent replay.",
+      "current_stage": "archive",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "done"
+        },
+        "review": {
+          "state": "done"
+        },
+        "tests-before": {
+          "state": "done"
+        },
+        "gitignore": {
+          "state": "done"
+        },
+        "apply": {
+          "state": "done"
+        },
+        "tests-after": {
+          "state": "done"
+        },
+        "lint": {
+          "state": "done"
+        },
+        "contracts-validate": {
+          "state": "done"
+        },
+        "verify": {
+          "state": "done"
+        },
+        "verify-runtime": {
+          "state": "done"
+        },
+        "tasks-audit": {
+          "state": "done"
+        },
+        "archive": {
+          "state": "done"
+        },
+        "commit": {
+          "state": "done"
+        }
+      }
+    },
+    {
+      "id": "005",
+      "change_name": "visual-grouping",
+      "propose_file": "spec-backlog/iteration-5-visual-grouping.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/visual-grouping",
+      "status": "complete",
+      "started": "2026-04-27",
+      "completed": "2026-04-27",
+      "notes": "Migrated from legacy autorun-progress.md: completed through archive; archived at openspec/changes/archive/2026-04-26-visual-grouping; implementation already present on main. New-format stages are marked satisfied to prevent replay.",
+      "current_stage": "archive",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "done"
+        },
+        "review": {
+          "state": "done"
+        },
+        "tests-before": {
+          "state": "done"
+        },
+        "gitignore": {
+          "state": "done"
+        },
+        "apply": {
+          "state": "done"
+        },
+        "tests-after": {
+          "state": "done"
+        },
+        "lint": {
+          "state": "done"
+        },
+        "contracts-validate": {
+          "state": "done"
+        },
+        "verify": {
+          "state": "done"
+        },
+        "verify-runtime": {
+          "state": "done"
+        },
+        "tasks-audit": {
+          "state": "done"
+        },
+        "archive": {
+          "state": "done"
+        },
+        "commit": {
+          "state": "done"
+        }
+      }
+    },
+    {
+      "id": "006",
+      "change_name": "settings-and-polish",
+      "propose_file": "spec-backlog/iteration-6-settings-and-polish.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/settings-and-polish",
+      "status": "complete",
+      "started": "2026-04-27",
+      "completed": "2026-04-27",
+      "notes": "Migrated from legacy autorun-progress.md: completed through archive; archived at openspec/changes/archive/2026-04-27-settings-and-polish; implementation already present on main. New-format stages are marked satisfied to prevent replay.",
+      "current_stage": "archive",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "done"
+        },
+        "review": {
+          "state": "done"
+        },
+        "tests-before": {
+          "state": "done"
+        },
+        "gitignore": {
+          "state": "done"
+        },
+        "apply": {
+          "state": "done"
+        },
+        "tests-after": {
+          "state": "done"
+        },
+        "lint": {
+          "state": "done"
+        },
+        "contracts-validate": {
+          "state": "done"
+        },
+        "verify": {
+          "state": "done"
+        },
+        "verify-runtime": {
+          "state": "done"
+        },
+        "tasks-audit": {
+          "state": "done"
+        },
+        "archive": {
+          "state": "done"
+        },
+        "commit": {
+          "state": "done"
+        }
+      }
+    },
+    {
+      "id": "007",
+      "change_name": "ui-icon-refinement",
+      "propose_file": "spec-backlog/iteration-7-ui-icon-refinement.md",
+      "notes_file": null,
+      "layout": "A",
+      "branch": "feat/ui-icon-refinement",
+      "status": "complete",
+      "started": "2026-04-27",
+      "completed": "2026-04-28",
+      "notes": "Migrated from legacy autorun-progress.md: completed through archive; archived at openspec/changes/archive/2026-04-28-ui-icon-refinement; implementation already present on main. New-format stages are marked satisfied to prevent replay.",
+      "current_stage": "archive",
+      "stages": {
+        "branch": {
+          "state": "done"
+        },
+        "propose": {
+          "state": "done"
+        },
+        "review": {
+          "state": "done"
+        },
+        "tests-before": {
+          "state": "done"
+        },
+        "gitignore": {
+          "state": "done"
+        },
+        "apply": {
+          "state": "done"
+        },
+        "tests-after": {
+          "state": "done"
+        },
+        "lint": {
+          "state": "done"
+        },
+        "contracts-validate": {
+          "state": "done"
+        },
+        "verify": {
+          "state": "done"
+        },
+        "verify-runtime": {
+          "state": "done"
+        },
+        "tasks-audit": {
+          "state": "done"
+        },
+        "archive": {
+          "state": "done"
+        },
+        "commit": {
+          "state": "done"
+        }
+      }
+    }
+  ],
+  "session_stages_completed": 0
+}

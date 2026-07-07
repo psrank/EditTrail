@@ -1,3 +1,5 @@
+/opsx:propose visual-grouping
+
 # EditTrail — Iteration 5: Visual Grouping
 
 ## Goal
